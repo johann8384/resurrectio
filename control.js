@@ -40,7 +40,7 @@ function RecorderUI() {
 	            ui.set_stopped();
 	        }
 	        chrome.tabs.getSelected(null, function(tab) {
-                  document.forms[0].elements["url"].value = tab.url;
+                  document.forms[0].elements["url"].value = 'http://';//tab.url;
             });
 	    }
 	});
@@ -70,6 +70,8 @@ RecorderUI.prototype.set_started = function() {
   e.style.display = 'none';
   e = document.getElementById("bcomment");
   e.style.display = '';
+  e = document.getElementById("bexportnccwebperf");
+  e.style.display = 'none';
   e = document.getElementById("bexport");
   e.style.display = 'none';
   e = document.getElementById("bexportxy");
@@ -91,6 +93,8 @@ RecorderUI.prototype.set_stopped = function() {
   e.style.display = '';
 	e = document.getElementById("bcomment");
 	e.style.display = 'none';
+	e = document.getElementById("bexportnccwebperf");
+	e.style.display = '';
 	e = document.getElementById("bexport");
 	e.style.display = '';
   e = document.getElementById("bexportxy");
@@ -128,6 +132,8 @@ RecorderUI.prototype.hidecomment = function(bsave) {
 RecorderUI.prototype.export = function(options) {
   if(options && options.xy) {
     chrome.tabs.create({url: "./casper.html?xy=true"});
+  } else if (options && options.nccwebperf){
+	chrome.tabs.create({url: "./pa.html"});
   } else {
     chrome.tabs.create({url: "./casper.html"});
   }
@@ -143,6 +149,7 @@ window.onload = function(){
     document.querySelector('input#bgo').onclick=function() {ui.start(); return false;};
     document.querySelector('input#bstop').onclick=function() {ui.stop(); return false;};
     document.querySelector('input#bcomment').onclick=function() {ui.showcomment(); return false;};
+	document.querySelector('input#bexportnccwebperf').onclick=function() {ui.export({nccwebperf: true}); return false;};
     document.querySelector('input#bexport').onclick=function() {ui.export(); return false;};
     document.querySelector('input#bexportxy').onclick=function() {ui.export({xy: true}); return false;};
     document.querySelector('input#bdoc').onclick=function() {ui.exportdoc(); return false;};
