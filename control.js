@@ -40,7 +40,7 @@ function RecorderUI() {
 	            ui.set_stopped();
 	        }
 	        chrome.tabs.getSelected(null, function(tab) {
-                  document.forms[0].elements["url"].value = 'http://';//tab.url;
+                  document.forms[0].elements["url"].value = tab.url;
             });
 	    }
 	});

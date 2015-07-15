@@ -245,6 +245,7 @@ TestRecorder.TestCase = function() {
 }
 
 TestRecorder.TestCase.prototype.append = function(o) {
+    console.log('append',o);
     this.items[this.items.length] = o;
     chrome.runtime.sendMessage({action: "append", obj: o});
 }
@@ -445,10 +446,11 @@ TestRecorder.CommentEvent = function(text) {
     this.text = text;
 }
 
-TestRecorder.KeyEvent = function(target, text) {
+TestRecorder.KeyEvent = function(target, text, code) {
     this.type = TestRecorder.EventTypes.KeyPress;
     this.info = new TestRecorder.ElementInfo(target);
     this.text = text;
+    this.code = code;
 }
 
 TestRecorder.MouseEvent = function(type, target, x, y) {
@@ -863,7 +865,7 @@ TestRecorder.Recorder.prototype.captureEvents = function() {
     TestRecorder.Browser.captureEvent(wnd, "mouseup", this.onmouseup);
     TestRecorder.Browser.captureEvent(wnd, "click", this.onclick);
     TestRecorder.Browser.captureEvent(wnd, "change", this.onchange);
-    TestRecorder.Browser.captureEvent(wnd, "keypress", this.onkeypress);
+    TestRecorder.Browser.captureEvent(wnd, "keydown", this.onkeypress);
     TestRecorder.Browser.captureEvent(wnd, "select", this.onselect);
     TestRecorder.Browser.captureEvent(wnd, "submit", this.onsubmit);
 }
@@ -876,7 +878,7 @@ TestRecorder.Recorder.prototype.releaseEvents = function() {
     TestRecorder.Browser.releaseEvent(wnd, "mouseup", this.onmouseup);
     TestRecorder.Browser.releaseEvent(wnd, "click", this.onclick);
     TestRecorder.Browser.releaseEvent(wnd, "change", this.onchange);
-    TestRecorder.Browser.releaseEvent(wnd, "keypress", this.onkeypress);
+    TestRecorder.Browser.releaseEvent(wnd, "keydown", this.onkeypress);
     TestRecorder.Browser.releaseEvent(wnd, "select", this.onselect);
     TestRecorder.Browser.releaseEvent(wnd, "submit", this.onsubmit);
 }
@@ -957,8 +959,8 @@ TestRecorder.Recorder.prototype.onchange = function(e) {
     var e = new TestRecorder.Event(e);
     var et = TestRecorder.EventTypes;
     var v = new TestRecorder.ElementEvent(et.Change, e.target());
+    recorder.log("value changed: " + e.target().value, recorder.testcase ,v);
     recorder.testcase.append(v);
-    recorder.log("value changed: " + e.target().value);
 }
 
 TestRecorder.Recorder.prototype.onselect = function(e) {
@@ -1064,7 +1066,7 @@ TestRecorder.Recorder.prototype.onkeypress = function(e) {
         recorder.testcase.poke(last);
     } else {
         recorder.testcase.append(
-            new TestRecorder.KeyEvent(e.target(), e.keychar())
+            new TestRecorder.KeyEvent(e.target(), e.keychar(), e.keycode())
         );
     }
     return true;

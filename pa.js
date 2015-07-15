@@ -41,6 +41,14 @@ function PaRenderer(document) {
     this.screen_id = 1;
 }
 
+// certain events should be clicked but others should be setting the value after a change
+// otherwise text deletes are missed, select box values are missed etc
+var clickEvents = [ 'radio', 'checkbox', 'submit', 'button' ];
+
+PaRenderer.prototype.doClick = function ( type ) {
+    return (clickEvents.indexOf( type ) > 0);
+};
+
 PaRenderer.prototype.pyrepr = function(text, escape) {
     // There should a more eloquent way of doing this but by  doing the escaping before adding the string quotes prevents the string quotes from accidentally getting escaped creating a syntax error in the output code.
     var s = text;
@@ -136,7 +144,7 @@ PaRenderer.prototype.cleanStringForXpath = function(str, escape)  {
 var d = {};
 d[EventTypes.OpenUrl] = "openUrl";
 d[EventTypes.Click] = "click";
-//d[EventTypes.Change] = "change";
+d[EventTypes.Change] = "change";
 d[EventTypes.Comment] = "comment";
 d[EventTypes.Submit] = "submit";
 d[EventTypes.CheckPageTitle] = "checkPageTitle";
@@ -255,29 +263,25 @@ PaRenderer.prototype.click = function(item) {
             }
         } else if (tag == 'input') {
             if (type === 'radio') {
-                this.stmt('exec\t'+ locator + '.checked = "true"',0);
-                this.space();
+//                this.stmt('exec\t'+ locator + '.checked = "true"',0);
+                _exec();
 
             } else if (type === 'checkbox') {
-                this.stmt('exec\t' + locator + '.checked = !' + locator + '.checked',0);
-                this.space();
+//                this.stmt('exec\t' + locator + '.checked = !' + locator + '.checked',0);
+                _exec();
             } else if (type === 'submit') {
                 _exec ( WAIT );
                 this.stmt('//assume that the button press will submit the form and load the next page (i.e. clickAndWait)',1);
                 this.space();
             } else if (type === 'button') {
-                _exec ( WAIT );
+                _exec ();
                 this.stmt('//assume that the button press will NOT submit load the next page (i.e. not clickAndWait)',1);
                 this.space();
             } else {
                 // just set focus for text variants eg text, tel, email, date
-                this.stmt('exec\t' + locator + '.focus()',0);
-                this.space();
-            }
-        } else if (tag == 'select') {
-            if (type === 'select-one') {
-                this.stmt('exec\t' + locator + '.value="' + item.info.value + '"',0);
-                this.space();
+                //this.stmt('exec\t' + locator + '.focus()',0);
+                //this.space();
+                _exec ();
             }
         } else if (tag === 'button') {
             if (type === 'submit') {
@@ -290,12 +294,23 @@ PaRenderer.prototype.click = function(item) {
                 this.space();
             }
         } else {
+            _exec ();
             this.stmt('//ignored tag ' + tag + ' for ' + item.info.selector,1);
             this.space();
         }
         console.log('click:' ,item.info.id,locator,tag,type,item );
     }
 };
+PaRenderer.prototype.change = function(item) {
+    var tag = item.info.tagName.toLowerCase(),
+        type = (''+item.info.type).toLowerCase(),
+        locator = this.getLocatorString( item );
+    console.log ('change input:',tag,type,item);
+    if ( !this.doClick( type ) ) {
+        this.stmt( 'exec\t' + locator + '.value="' + item.info.value + '"', 0 );
+    }
+};
+
 // now just sets the value, may need to trigger digest loops for jquery forms etc
 PaRenderer.prototype.keypress = function(item) {
     /*var text = item.text.replace('\n','').replace('\r', '\\r');
@@ -305,9 +320,12 @@ PaRenderer.prototype.keypress = function(item) {
      this.space();
      this.stmt('});',2);
      */
+/* this is now handled by change event as delete was being lost etc
     var locator = this.getLocatorString( item );
+
     this.stmt('exec\t' + locator + '.value="' + this.getEscapedText( item ) + '"',0);
     this.space();
+ */
 };
 
 // stub all methods for casper that are not defined and log if they get called
@@ -344,6 +362,7 @@ window.onload = function onpageload() {
                 dt.postToCasperbox();
             };
         } catch (err) {
+            console.log (err);
             // ignore errors here
         }
     });
