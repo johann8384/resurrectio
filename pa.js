@@ -95,7 +95,7 @@ PaRenderer.prototype.escapeBackslash = function(text) {
 // returns locator querySelector for itemstring
 PaRenderer.prototype.getLocatorString = function ( item ) {
     var selector;
-    console.log ('CALLED',item);
+//    console.log ('CALLED',item);
     if ( item && item.info && item.info.selector ) {
         selector = this.escapeBackslash( item.info.selector );
         return 'document.querySelector( "' + selector + '" )';
@@ -237,7 +237,7 @@ PaRenderer.prototype.click = function(item) {
         WAIT = true;
     // private functions to commont tasks
     function _exec ( wait) {
-        var _click = wait || '';
+        var waitStr = wait ? 'andWait' : '';
         _that.stmt( 'exec' + waitStr + '\t' + locator + '.click()', 0 );
         _that.space();
     }
@@ -296,7 +296,7 @@ PaRenderer.prototype.click = function(item) {
         console.log('click:' ,item.info.id,locator,tag,type,item );
     }
 };
-
+// now just sets the value, may need to trigger digest loops for jquery forms etc
 PaRenderer.prototype.keypress = function(item) {
     /*var text = item.text.replace('\n','').replace('\r', '\\r');
      this.space();
@@ -310,19 +310,19 @@ PaRenderer.prototype.keypress = function(item) {
     this.space();
 };
 
-
 // stub all methods for casper that are not defined and log if they get called
 var casperMethods = ["text", "stmt", "cont", "pyout", "pyrepr", "space", "regexp_escape", "escapeBackslash", "cleanStringForXpath", "dispatch", "render", "writeHeader", "writeFooter", "rewriteUrl", "shortUrl", "startUrl", "openUrl", "pageLoad", "normalizeWhitespace", "getControl", "getControlXPath", "getLinkXPath", "mousedrag", "click", "getFormSelector", "keypress", "submit", "screenShot", "comment", "checkPageTitle", "checkPageLocation", "checkTextPresent", "checkValue", "checkText", "checkHref", "checkEnabled", "checkDisabled", "checkSelectValue", "checkSelectOptions", "checkImageSrc", "waitAndTestSelector", "postToCasperbox"],
     stubCurry = function ( method ) {
-        // only log once
-        var _called = false;
-        return function () {
-            if (! _called) {
-                console.log( 'warning: PaRenderer.' + method + ' called', arguments );
-                _called = true;
-            }
-        };
+    // only log once
+    var _called = false;
+    return function () {
+        if (! _called) {
+            console.log( 'warning: PaRenderer.' + method + ' called', arguments );
+            _called = true;
+        }
     };
+};
+// used to get the casperMethods list    console.log ( Object.keys (PaRenderer.prototype) );
 for ( var i=0; i<casperMethods.length; i++) {
     if ( !PaRenderer.prototype[  casperMethods[i] ] ) {
         PaRenderer.prototype[  casperMethods[i] ] = stubCurry( casperMethods[i]);
@@ -332,7 +332,6 @@ for ( var i=0; i<casperMethods.length; i++) {
 // create instance and bootstrap to window.onLoad.
 var dt = new PaRenderer(document);
 window.onload = function onpageload() {
-// used to get the casperMethods list    console.log ( Object.keys (PaRenderer.prototype) );
     var with_xy = false;
     if(window.location.search=="?xy=true") {
         with_xy = true;
