@@ -295,7 +295,6 @@ PaRenderer.prototype.click = function(item) {
             }
         } else {
             _exec ();
-            this.stmt('//ignored tag ' + tag + ' for ' + item.info.selector,1);
             this.space();
         }
         console.log('click:' ,item.info.id,locator,tag,type,item );
@@ -341,6 +340,8 @@ var casperMethods = ["text", "stmt", "cont", "pyout", "pyrepr", "space", "regexp
         }
     };
 };
+
+
 // used to get the casperMethods list    console.log ( Object.keys (PaRenderer.prototype) );
 for ( var i=0; i<casperMethods.length; i++) {
     if ( !PaRenderer.prototype[  casperMethods[i] ] ) {
@@ -359,11 +360,8 @@ window.onload = function onpageload() {
         try {
             dt.items = response.items;
             dt.render( with_xy );
-            document.getElementById( "casperbox-button" ).onclick = function () {
-                dt.postToCasperbox();
-            };
         } catch (err) {
-            console.log (err);
+            console.trace (err);
             // ignore errors here
         }
     });
