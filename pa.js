@@ -355,10 +355,14 @@ window.onload = function onpageload() {
         with_xy = true;
     }
     chrome.runtime.sendMessage({action: "get_items"}, function(response) {
-        dt.items = response.items;
-        dt.render(with_xy);
-        document.getElementById("casperbox-button").onclick = function() {
-            dt.postToCasperbox();
-        };
+        try {
+            dt.items = response.items;
+            dt.render( with_xy );
+            document.getElementById( "casperbox-button" ).onclick = function () {
+                dt.postToCasperbox();
+            };
+        } catch (err) {
+            // ignore errors here
+        }
     });
 };
