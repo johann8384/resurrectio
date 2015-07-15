@@ -53,7 +53,6 @@ PaRenderer.prototype.pyrepr = function(text, escape) {
     // There should a more eloquent way of doing this but by  doing the escaping before adding the string quotes prevents the string quotes from accidentally getting escaped creating a syntax error in the output code.
     var s = text;
     if (escape) s = s.replace(/(['"])/g, "\\$1");
-    s = "'" + s + "'";
     return s;
 };
 
