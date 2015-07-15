@@ -102,7 +102,7 @@ PaRenderer.prototype.escapeBackslash = function(text) {
 // returns locator querySelector for itemstring
 PaRenderer.prototype.getLocatorString = function ( item ) {
     var selector;
-//    console.log ('CALLED',item);
+//  console.log ('CALLED',item);
     if ( item && item.info && item.info.selector ) {
         selector = this.escapeBackslash( item.info.selector );
         return 'document.querySelector( "' + selector + '" )';
@@ -114,7 +114,6 @@ PaRenderer.prototype.getLocatorString = function ( item ) {
 // gets the value for an item and fully escapes to make it safe for exec statement
 PaRenderer.prototype.getEscapedText = function ( item ) {
     var out = this.regexp_escape( item.text );
-    console.log('out',out);
     return this.escapeSpecial( out );
 };
 
@@ -294,14 +293,14 @@ PaRenderer.prototype.click = function(item) {
         } else {
             _exec ();
         }
-        console.log('click:' ,item.info.id,locator,tag,type,item );
+        //console.log('click:' ,item.info.id,locator,tag,type,item );
     }
 };
 PaRenderer.prototype.change = function(item) {
     var tag = item.info.tagName.toLowerCase(),
         type = (''+item.info.type).toLowerCase(),
         locator = this.getLocatorString( item );
-    console.log ('change input:',tag,type,item);
+    //console.log ('change input:',tag,type,item);
     if ( !this.doClick( type ) ) {
         this.stmt( 'exec\t' + locator + '.value="' + item.info.value + '"', 0 );
         this.space();
