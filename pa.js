@@ -308,6 +308,7 @@ PaRenderer.prototype.change = function(item) {
     console.log ('change input:',tag,type,item);
     if ( !this.doClick( type ) ) {
         this.stmt( 'exec\t' + locator + '.value="' + item.info.value + '"', 0 );
+        this.space();
     }
 };
 
