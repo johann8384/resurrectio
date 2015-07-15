@@ -245,7 +245,7 @@ PaRenderer.prototype.click = function(item) {
         WAIT = true;
     // private functions to commont tasks
     function _exec ( wait) {
-        var waitStr = wait ? 'andWait' : '';
+        var waitStr = wait ? 'AndWait' : '';
         _that.stmt( 'exec' + waitStr + '\t' + locator + '.click()', 0 );
         _that.space();
     }
