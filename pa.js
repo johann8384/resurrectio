@@ -175,12 +175,8 @@ PaRenderer.prototype.render = function(with_xy) {
             this.space();
 
         if(i==0) {
-            //if(item.type!=etypes.OpenUrl) {
-            //    this.text("ERROR: the recorded sequence does not start with a url openning.");
-            //} else {
             this.startUrl(item);
             continue;
-            //}
         }
 
         // remember last MouseDown to identify drag
@@ -236,34 +232,26 @@ PaRenderer.prototype.startUrl = function(item) {
 PaRenderer.prototype.click = function(item) {
     var tag = item.info.tagName.toLowerCase(),
         type = (''+item.info.type).toLowerCase(),
-        locator = this.getLocatorString( item );
-
+        locator = this.getLocatorString( item ),
+        _that = this,
+        WAIT = true;
+    // private functions to commont tasks
+    function _exec ( wait) {
+        var _click = wait || '';
+        _that.stmt( 'exec' + waitStr + '\t' + locator + '.click()', 0 );
+        _that.space();
+    }
     if(this.with_xy && !(tag == 'a' || tag == 'input' || tag == 'button')) {
         this.stmt('this.then(function() {');
         this.stmt('    this.mouse.click('+ item.x + ', '+ item.y +');');
         this.stmt('});');
     } else {
-        /*if (!id) {
-         if (tag === 'a') {
-         this.stmt('execAndWait\tdocument.querySelector("' + selector + '").click()',0);
-         }
-         else {
-         this.stmt('exec\tdocument.querySelector("' + selector + '").click()',0);
-         }
-         this.space();
-         }
-         else { */
         if (tag == 'a') {
             var href = item.info.href;
             if (href.length && href.substr(0,1) !== "#") {
-                //this.stmt('clickAndWait\tid=' + id,0);
-                //this.space();
-                this.stmt('execAndWait\t' + locator + '.click()',0);
-                this.space();
+                _exec ( WAIT );
             } else {
-                //this.stmt('click\tid=' + id,0);
-                this.stmt('exec\t' + locator + '").click()',0);
-                this.space();
+                _exec ();
             }
         } else if (tag == 'input') {
             if (type === 'radio') {
@@ -274,13 +262,11 @@ PaRenderer.prototype.click = function(item) {
                 this.stmt('exec\t' + locator + '.checked = !' + locator + '.checked',0);
                 this.space();
             } else if (type === 'submit') {
-                this.stmt('execAndWait\t' + locator + '.click()',0);
-                this.space();
+                _exec ( WAIT );
                 this.stmt('//assume that the button press will submit the form and load the next page (i.e. clickAndWait)',1);
                 this.space();
             } else if (type === 'button') {
-                this.stmt('exec\t' + locator + '").click()',0);
-                this.space();
+                _exec ( WAIT );
                 this.stmt('//assume that the button press will NOT submit load the next page (i.e. not clickAndWait)',1);
                 this.space();
             } else {
@@ -295,13 +281,11 @@ PaRenderer.prototype.click = function(item) {
             }
         } else if (tag === 'button') {
             if (type === 'submit') {
-                this.stmt('execAndWait\t' + locator + '.click()',0);
-                this.space();
+                _exec ( WAIT );
                 this.stmt('//assume that the button press will submit the form and load the next page (i.e. clickAndWait)',1);
                 this.space();
             } else {
-                this.stmt('exec\t' + locator + '").click()',0);
-                this.space();
+                _exec ();
                 this.stmt('//assume that the button press will NOT submit load the next page (i.e. not clickAndWait)',1);
                 this.space();
             }
@@ -309,8 +293,7 @@ PaRenderer.prototype.click = function(item) {
             this.stmt('//ignored tag ' + tag + ' for ' + item.info.selector,1);
             this.space();
         }
-        //}
-        console.log('id:' ,item.info.id,tag,item.info.type,item );
+        console.log('click:' ,item.info.id,locator,tag,type,item );
     }
 };
 
