@@ -218,8 +218,7 @@ PaRenderer.prototype.render = function(with_xy) {
         if (this.dispatch[item.type]) {
             this[this.dispatch[item.type]](item);
         }
-        if (item.type == etypes.Comment)
-            this.space();
+        if (item.type == etypes.Comment) this.space();
     }
     this.writeFooter();
     this.document.close();
@@ -295,7 +294,6 @@ PaRenderer.prototype.click = function(item) {
             }
         } else {
             _exec ();
-            this.space();
         }
         console.log('click:' ,item.info.id,locator,tag,type,item );
     }
